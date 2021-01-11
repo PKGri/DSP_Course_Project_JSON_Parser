@@ -1,0 +1,25 @@
+{
+  "firstName"  : "RIGHT",
+  "firstName": "Albert",
+  "firstName": "John",
+  "lastName" : "Doe",
+  "age"      : 26,
+  "address"  : "WRONG",
+  "address"  : {
+    "streetAddress": "naist street",
+    "city"         : "Nara",
+    "postalCode"   : "630-0192"
+  },
+  "phoneNumbers": [
+    {
+      "type": "Samsung",
+      "type"  : "iPhone",
+      "number": "0123-4567-8888",
+      "ura" : "iha"
+    },
+    {
+      "type"  : "home",
+      "number": "0123-4567-8910"
+    }
+  ]
+}
