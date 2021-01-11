@@ -43,25 +43,25 @@ void JSONFile::open()
 		char c;
 		json_file >> c;
 
-		if (c != '{' && c != '[')
+		if (c != '{' && c != '[') // Main element must be object or array
 		{
 			throw std::runtime_error("Expected '{' or '[' at beginning of file!");
 		}
 
-		if (c == '{')
+		if (c == '{') // If object
 		{
 			json_file.unget();
 			fileObject = parseValue(json_file, "");
 		}
-		else
+		else // If array
 		{
 			json_file.unget();
 			fileObject = parseValue(json_file, "");
 		}
 
-		updateAncestors();
+		updateAncestors(); // For proper printing
 
-		updateChildren();
+		updateChildren(); // Removes duplicates
 
 		std::cout << "Successfully opened " << path << '\n';
 
@@ -158,7 +158,7 @@ void uncompressedPrint(std::ofstream &outputFile, JSONElement *toPrint)
 	outputFile << "\n}";
 }
 
-void JSONFile::saveElement(const std::string JSONPath)
+void JSONFile::saveElement(const std::string JSONPath) // Saves element at <JSONPath> in the context of the working object
 {
 	std::queue<std::string> nodes = parseJSONPath(JSONPath);
 	JSONElement *toPrint = workingObject->traverse(nodes);
@@ -222,7 +222,7 @@ void JSONFile::saveElementAs(const std::string JSONPath)
 	saveElement(JSONPath);
 }
 
-void JSONFile::saveSelected()
+void JSONFile::saveSelected() // Saves selected object
 {
 	std::ofstream outputFile(path.data());
 
@@ -280,13 +280,13 @@ void JSONFile::saveSelectedAs()
 	saveSelected();
 }
 
-void JSONFile::JSONPath(const std::string JSONPath)
+void JSONFile::JSONPath(const std::string JSONPath) // Prints element at <JSONPath> in the context of the working object 
 {
 	std::queue<std::string> nodes = parseJSONPath(JSONPath);
 	std::cout << *workingObject->traverse(nodes) << '\n';
 }
 
-void JSONFile::findByKey(const std::string key)
+void JSONFile::findByKey(const std::string key) // Used by select function
 {
 	if (key == "$")
 	{
@@ -299,7 +299,7 @@ void JSONFile::findByKey(const std::string key)
 	
 }
 
-void JSONFile::set(const std::string JSONPath)
+void JSONFile::set(const std::string JSONPath) // Used by set function
 {
 	std::queue<std::string> nodes = parseJSONPath(JSONPath);
 
@@ -327,7 +327,7 @@ void JSONFile::set(const std::string JSONPath)
 	updateAncestors();
 }
 
-void JSONFile::create(const std::string JSONPath)
+void JSONFile::create(const std::string JSONPath) //(work in progress)
 {
 	std::queue<std::string> toCreate = parseJSONPath(JSONPath);
 	fileObject.createPath(toCreate);
@@ -335,7 +335,7 @@ void JSONFile::create(const std::string JSONPath)
 
 }
 
-void JSONFile::remove(const std::string JSONPath)
+void JSONFile::remove(const std::string JSONPath) // Removes element at <JSONPath>
 {
 	std::queue<std::string> nodes = parseJSONPath(JSONPath);
 	JSONElement *toRemove = fileObject.traverse(nodes);
@@ -344,7 +344,7 @@ void JSONFile::remove(const std::string JSONPath)
 	parent->removeChild(toRemove);
 }
 
-void JSONFile::move(const std::string JSONPath1, const std::string JSONPath2)
+void JSONFile::move(const std::string JSONPath1, const std::string JSONPath2) //(work in progress)
 {
 	std::queue<std::string> toFind = parseJSONPath(JSONPath1);
 	JSONElement *found = fileObject.traverse(toFind);
@@ -353,7 +353,7 @@ void JSONFile::move(const std::string JSONPath1, const std::string JSONPath2)
 	fileObject.createPath(toMove);
 }
 
-void JSONFile::order(const std::string JSONPath)
+void JSONFile::order(const std::string JSONPath) // Used by order
 {
 	std::string key;
 	std::cout << "Please input key:\n";
@@ -366,13 +366,13 @@ void JSONFile::order(const std::string JSONPath)
 
 }
 
-void JSONFile::selectedAsWorking()
+void JSONFile::selectedAsWorking() // Change working object to selected object
 {
 	workingObject = &selectedObject;
 	std::cout << "Working on selected object!\n";
 }
 
-void JSONFile::reset()
+void JSONFile::reset() // Change working object to file object
 {
 	workingObject = &fileObject;
 	std::cout << "Working on original object!\n";

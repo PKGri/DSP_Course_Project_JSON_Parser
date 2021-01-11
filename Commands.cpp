@@ -105,7 +105,7 @@ void help() // Prints supported functionalities
 				 " -removes the result of the evaluated <JSONPath>"
 				 "(work in progress)move <JSONPath 1>\n<JSONPath 2>\n"
 				 " -moves object found at <JSONPath 1> to <JSONPath 2>"
-				 "(work in progress)order <JSONPath>"
+				 "order <JSONPath>"
 				 " -orders result of <JSONPath> evaluation if result is array"
 				 "JSONPath <JSONPath>\n"
 				 " -prints the result from evaluating simple <JSONPath> expressions\n"
@@ -133,16 +133,16 @@ void printSelected() // Prints loaded file data
 	file.printSelected();
 }
 
-void select()
+void select() // Selects all elements with given key
 {
 	std::string key;
 	std::cout << "Please input key:\n";
-	std::cin >> key;
+	getline(std::cin, key);
 
 	file.findByKey(key);
 }
 
-void set()
+void set() // Changes element found at <JSONPath>
 {
 	std::cout << "Please input JSONPath: ";
 	std::string JSONPath = inputJSONPath();
@@ -150,7 +150,7 @@ void set()
 	file.set(JSONPath);
 }
 
-void create()
+void create() //(work in progress) Creates element at <JSONPath> 
 {
 	std::cout << "Please input JSONPath: ";
 	std::string JSONPath = inputJSONPath();
@@ -158,7 +158,7 @@ void create()
 	file.create(JSONPath);
 }
 
-void remove()
+void remove() // Removes element at <JSONPath>
 {
 	std::cout << "Please input JSONPath: ";
 	std::string JSONPath = inputJSONPath();
@@ -166,7 +166,7 @@ void remove()
 	file.remove(JSONPath);
 }
 
-void move()
+void move() //(work in progress) Moves element from <JSONPath 1> to <JSONPath 2>
 {
 	std::cout << "Please input first JSONPath: ";
 	std::string JSONPath1 = inputJSONPath();
@@ -176,7 +176,7 @@ void move()
 	file.move(JSONPath1, JSONPath2);
 }
 
-void order()
+void order() // Orders elements of element at <JSONPath> if element is array
 {
 	std::cout << "Please input JSONPath: ";
 	std::string JSONPath = inputJSONPath();
@@ -184,7 +184,7 @@ void order()
 	file.order(JSONPath);
 }
 
-void selectedAsWorking()
+void selectedAsWorking() 
 {
 	file.selectedAsWorking();
 }
@@ -194,7 +194,7 @@ void reset()
 	file.reset();
 }
 
-void JSONPath()
+void JSONPath() // Prints element at <JSONPath>
 {
 	std::string JSONPath = inputJSONPath();
 

@@ -4,7 +4,7 @@
 #include <stack>
 #include <queue>
 
-char consent(const std::string question)
+char consent(const std::string question) // Used when asking boolean questions to user
 {
 	std::cout << question << " - 'Y'/'N' ";
 	char c;
@@ -32,7 +32,7 @@ bool isJSONFile(const std::string &filename) // Checks file extension
     }
 }
 
-bool areBracketsBalanced(std::string data)
+bool areBracketsBalanced(std::string data) // Checks if opened and closed { and [ are 1:1
 {
     std::stack<char> s;
     char c;
@@ -73,12 +73,7 @@ bool areBracketsBalanced(std::string data)
     return (s.empty());
 }
 
-bool validate()
-{
-    return false;
-}
-
-JSONElement parseValue(std::istream &is, const std::string key)
+JSONElement parseValue(std::istream &is, const std::string key) // General parse function, this constructs elements
 {
     char c;
 
@@ -105,7 +100,7 @@ JSONElement parseValue(std::istream &is, const std::string key)
     }
 }
 
-std::list<JSONElement> parseObject(std::istream &is)
+std::list<JSONElement> parseObject(std::istream &is) 
 {
     char c;
     std::list<JSONElement> result;
@@ -114,17 +109,17 @@ std::list<JSONElement> parseObject(std::istream &is)
     {
         is >> c;
 
-        if (c == '}')
+        if (c == '}') // If empty object
         {
             return result;
         }
 
-        if (c != '"')
+        if (c != '"') // If key doesn't follow
         {
             throw std::runtime_error("Expected '\"'!");
         }
 
-        std::string key = parseString(is);
+        std::string key = parseString(is); // Parse key
 
         is >> c;
         if (c != ':')
@@ -136,7 +131,7 @@ std::list<JSONElement> parseObject(std::istream &is)
         result.push_back(toAdd);
         is >> c;
 
-    } while (c == ',');
+    } while (c == ','); // Whilte there are children to parse
 
     if (c != '}')
     {
@@ -175,7 +170,7 @@ std::list<JSONElement> parseArray(std::istream &is)
     return result;
 }
 
-bool specialChar(const char c)
+bool specialChar(const char c) // For when parsing strings
 {
     return c == '"' || c == '\\' || c == '/' || c == 'b' || c == 'f' || c == 'n' || c == 'r' || c == 't' || c == 'u';
 }
@@ -216,7 +211,7 @@ std::string parseNumber(std::istream &is)
     }
     is.unget();
 
-    std::regex number("-?(?:0|[1-9][0-9]*)(?:.[0-9]+)?(?:[eE][+-]?[0-9]+)?");
+    std::regex number("-?(?:0|[1-9][0-9]*)(?:.[0-9]+)?(?:[eE][+-]?[0-9]+)?"); // Matches JSON number
 
     std::smatch matches;
     std::regex_search(result, matches, number);
@@ -254,7 +249,7 @@ std::queue<std::string> parseJSONPath(std::string JSONPath) // Creates vector of
     JSONPath = JSONPath.substr(JSONPath.find_first_not_of(" \t\v\r\n"),
                                JSONPath.find_last_not_of(" \t\v\r\n") - JSONPath.find_first_not_of(" \t\v\r\n") + 1); // Removes leading and trailing whitespaces
 
-    std::regex pathReg("[$]?((\\['[^\\[]*'\\])|(\\[(?:0|[1-9][0-9]*)\\]))*");
+    std::regex pathReg("[$]?((\\['[^\\[]*'\\])|(\\[(?:0|[1-9][0-9]*)\\]))*"); // Matches entire JSONPath
 
     std::smatch matches;
 
@@ -265,7 +260,7 @@ std::queue<std::string> parseJSONPath(std::string JSONPath) // Creates vector of
         throw std::runtime_error("Invalid JSONPath!");
     }
 
-    std::regex node("(\\['[^\\[]*'\\])|(\\[(?:0|[1-9][0-9]*)\\])");
+    std::regex node("(\\['[^\\[]*'\\])|(\\[(?:0|[1-9][0-9]*)\\])"); // Matches individual JSONPath nodes
 
     std::queue<std::string> nodes;
 

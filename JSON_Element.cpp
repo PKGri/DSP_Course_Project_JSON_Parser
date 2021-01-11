@@ -73,7 +73,7 @@ void JSONElement::updateAncestors(const size_t &ancestors)
     }
 }
 
-void JSONElement::updateChildren()
+void JSONElement::updateChildren() // Removes duplicate children in objects
 {
     if (type == 'o')
     {
@@ -113,7 +113,7 @@ void JSONElement::updateChildren()
 
 void JSONElement::createPath(std::queue<std::string> &nodes)
 {
-    std::queue<std::string> toCreate = nodes;
+    std::queue<std::string> toCreate = nodes; //(work in progress) Creates objects
 
     try
     {
@@ -136,13 +136,13 @@ void JSONElement::createPath(std::queue<std::string> &nodes)
     }
 }
 
-void JSONElement::addChild(JSONElement child)
+void JSONElement::addChild(JSONElement child) // Adds child to this->children
 {
     child.updateAncestors(ancestors + 1);
     children.push_back(child);
 }
 
-void JSONElement::removeChild(JSONElement *toRemove)
+void JSONElement::removeChild(JSONElement *toRemove) // Removes child from this-children
 {
     std::list<JSONElement>::iterator child = children.begin();
     while (child != children.end())
@@ -159,7 +159,7 @@ void JSONElement::removeChild(JSONElement *toRemove)
     }
 }
 
-const std::string &JSONElement::getDataByKey(const std::string _key)
+const std::string &JSONElement::getDataByKey(const std::string _key) // Returns data if it's key is equal to _key
 {
     for (JSONElement &child : children)
     {
@@ -172,7 +172,7 @@ const std::string &JSONElement::getDataByKey(const std::string _key)
     throw std::runtime_error("Element has no such child!");
 }
 
-bool JSONElement::hasChildWithKey(const std::string _key)
+bool JSONElement::hasChildWithKey(const std::string _key) // Checks if object has child with key equal to _key
 {
     for (JSONElement &child : children)
     {
@@ -184,7 +184,7 @@ bool JSONElement::hasChildWithKey(const std::string _key)
     return false;
 }
 
-bool JSONElement::checkChildren(const std::string _key)
+bool JSONElement::checkChildren(const std::string _key) // Checks if all children in array are objects and contain a child with key equal to _key
 {
     for (JSONElement &child : children)
     {
@@ -196,19 +196,19 @@ bool JSONElement::checkChildren(const std::string _key)
     return true;
 }
 
-bool compare(JSONElement &first, JSONElement&second, std::string _key)
+bool compare(JSONElement &first, JSONElement&second, std::string _key) // Comp function to use for sorting array
 {
     return first.getDataByKey(_key).compare(second.getDataByKey(_key)) == -1;
 }
 
-void JSONElement::order(const std::string _key)
+void JSONElement::order(const std::string _key) // Order array elements by data corresponding to _key
 {
     if (type != 'a')
     {
         throw std::runtime_error("Element is not array!");
     }
 
-    if (checkChildren(_key))
+    if (checkChildren(_key)) // Can order children only if they are all objects and have a child with key equal to key
     {
         auto compareCurry = std::bind(compare, std::placeholders::_1, std::placeholders::_2, _key);
         children.sort(compareCurry);
@@ -219,7 +219,7 @@ void JSONElement::order(const std::string _key)
     }
 }
 
-JSONElement &JSONElement::takeByKey(const std::string _key, JSONElement &result)
+JSONElement &JSONElement::takeByKey(const std::string _key, JSONElement &result) // Goes through children and their children searching for elements with key equal to _key
 {
     for (JSONElement child : children)
     {
@@ -234,7 +234,7 @@ JSONElement &JSONElement::takeByKey(const std::string _key, JSONElement &result)
     return result;
 }
 
-JSONElement JSONElement::findByKey(const std::string _key)
+JSONElement JSONElement::findByKey(const std::string _key) // Creates an array of all elements with key equal to _key
 {
     JSONElement result('a');
 
@@ -289,42 +289,44 @@ void JSONElement::clear()
 {
     type = 0;
     key = "";
+    parent = nullptr;
     children.clear();
     data = "";
+    ancestors = 0;
 }
 
-JSONElement *JSONElement::traverse(std::queue<std::string> &nodes)
+JSONElement *JSONElement::traverse(std::queue<std::string> &nodes) // Recursively finds element for JSONPath evaluation
 {
-    if (nodes.empty())
+    if (nodes.empty()) //If this is the sought after element
     {
         return this;
     }
-    else if (type == 'n' || type == 's')
+    else if (type == 'n' || type == 's') // If nodes isn't empty, but *this is neither object, nor array
     {
         throw std::runtime_error("No match!");
     }
     else
     {
-        std::string content = nodes.front().substr(1, nodes.front().length() - 2);
+        std::string content = nodes.front().substr(1, nodes.front().length() - 2); // Removes [ ] brackets from node string
 
-        if (content[0] == '\'' && type == 'o')
+        if (content[0] == '\'' && type == 'o') //If current node is a key and current element is an object
         {
-            content = content.substr(1, content.length() - 2);
+            content = content.substr(1, content.length() - 2); // Removes '' from both ends of the string to compare
 
             for (JSONElement &child : children)
             {
                 if (child.key == content)
                 {
-                    nodes.pop();
-                    return child.traverse(nodes);
+                    nodes.pop(); // Readies next node
+                    return child.traverse(nodes); // Continues on down
                 }
             }
 
             throw std::runtime_error("No match!");
         }
-        else if (content[0] != '\'' && type == 'a')
+        else if (content[0] != '\'' && type == 'a') // If current node is an index and current element is an array
         {
-            std::stringstream numberStream(content);
+            std::stringstream numberStream(content); // To convert to number
             size_t index;
             numberStream >> index;
 
@@ -337,8 +339,8 @@ JSONElement *JSONElement::traverse(std::queue<std::string> &nodes)
 
             std::advance(it, index);
 
-            nodes.pop();
-            return it->traverse(nodes);
+            nodes.pop(); // Readies next node
+            return it->traverse(nodes); // Continues on down
         }
         else
         {
@@ -354,7 +356,7 @@ void JSONElement::operator=(const JSONElement &other)
 
 bool JSONElement::operator==(const JSONElement &other) const
 {
-    return type == other.type && key == other.key &&
+    return type == other.type && key == other.key && parent == other.parent &&
            data == other.data && children == other.children &&
            ancestors == other.ancestors;
 }
@@ -372,7 +374,7 @@ void JSONElement::printKey(std::ostream &os) const
     }
 }
 
-void nesting(std::ostream &os, const size_t ancestors)
+void nesting(std::ostream &os, const size_t ancestors) // Adds necessary indentation when printing
 {
     for (size_t i = 0; i < ancestors; i++)
     {
@@ -380,7 +382,7 @@ void nesting(std::ostream &os, const size_t ancestors)
     }
 }
 
-void printParent(std::ostream &os, const JSONElement &element, const char bracket)
+void printParent(std::ostream &os, const JSONElement &element, const char bracket) // Function to print objects and arrays (because they are parents)
 {
     element.printKey(os);
     os << bracket;
@@ -418,7 +420,7 @@ std::ostream &operator<<(std::ostream &os, const JSONElement &element)
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const std::list<JSONElement> &children)
+std::ostream &operator<<(std::ostream &os, const std::list<JSONElement> &children) // To make printing children easier
 {
     for (const JSONElement &child : children)
     {
@@ -432,7 +434,8 @@ std::ostream &operator<<(std::ostream &os, const std::list<JSONElement> &childre
     return os;
 }
 
-/////////////////////////// COMPRESSED PRINTING \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+//////////////////////////// COMPRESSED PRINTING \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+**************** FOR WHEN USER WISHES TO SAVE 1KB OF WHITESPACES ******************
 
 void JSONElement::compressedPrintKey(std::ostream &os) const
 {
