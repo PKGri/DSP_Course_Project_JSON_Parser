@@ -4,6 +4,18 @@
 #include <stack>
 #include <queue>
 
+char consent(const std::string question)
+{
+	std::cout << question << " - 'Y'/'N' ";
+	char c;
+	do
+	{
+		std::cin >> c;
+	} while (c != 'Y' && c != 'y' && c != 'N' && c != 'n');
+	return c;
+}
+
+
 bool isJSONFile(const std::string &filename) // Checks file extension
 {
     if (filename.size() < 6)

@@ -136,6 +136,7 @@ void printSelected() // Prints loaded file data
 void select()
 {
 	std::string key;
+	std::cout << "Please input key:\n";
 	std::cin >> key;
 
 	file.findByKey(key);
@@ -143,6 +144,7 @@ void select()
 
 void set()
 {
+	std::cout << "Please input JSONPath: ";
 	std::string JSONPath = inputJSONPath();
 
 	file.set(JSONPath);
@@ -150,10 +152,15 @@ void set()
 
 void create()
 {
+	std::cout << "Please input JSONPath: ";
+	std::string JSONPath = inputJSONPath();
+
+	file.create(JSONPath);
 }
 
 void remove()
 {
+	std::cout << "Please input JSONPath: ";
 	std::string JSONPath = inputJSONPath();
 
 	file.remove(JSONPath);
@@ -161,10 +168,20 @@ void remove()
 
 void move()
 {
+	std::cout << "Please input first JSONPath: ";
+	std::string JSONPath1 = inputJSONPath();
+	std::cout << "Please input second JSONPath: ";
+	std::string JSONPath2 = inputJSONPath();
+
+	file.move(JSONPath1, JSONPath2);
 }
 
 void order()
 {
+	std::cout << "Please input JSONPath: ";
+	std::string JSONPath = inputJSONPath();
+
+	file.order(JSONPath);
 }
 
 void selectedAsWorking()

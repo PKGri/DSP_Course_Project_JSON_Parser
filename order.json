@@ -1,0 +1,17 @@
+{
+    "articles": [
+        {
+            "name": "John Smith",
+            "rating": 1.8
+        },
+        {
+            "rating": 1.8,
+            "are" : "we",
+            "name": "John Smith3"
+        },
+        {
+            "name": "John Smith 2",
+            "rating": 2.8
+        }
+    ]
+}

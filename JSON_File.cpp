@@ -85,17 +85,6 @@ void JSONFile::printSelected()
 	std::cout << selectedObject << '\n';
 }
 
-char consent(const std::string question)
-{
-	std::cout << question << " - 'Y'/'N' ";
-	char c;
-	do
-	{
-		std::cin >> c;
-	} while (c != 'Y' && c != 'y' && c != 'N' && c != 'n');
-	return c;
-}
-
 void JSONFile::save()
 {
 	std::ofstream outputFile(path.data());
@@ -338,8 +327,12 @@ void JSONFile::set(const std::string JSONPath)
 	updateAncestors();
 }
 
-void JSONFile::create()
+void JSONFile::create(const std::string JSONPath)
 {
+	std::queue<std::string> toCreate = parseJSONPath(JSONPath);
+	fileObject.createPath(toCreate);
+
+
 }
 
 void JSONFile::remove(const std::string JSONPath)
@@ -351,12 +344,26 @@ void JSONFile::remove(const std::string JSONPath)
 	parent->removeChild(toRemove);
 }
 
-void JSONFile::move()
+void JSONFile::move(const std::string JSONPath1, const std::string JSONPath2)
 {
+	std::queue<std::string> toFind = parseJSONPath(JSONPath1);
+	JSONElement *found = fileObject.traverse(toFind);
+
+	std::queue<std::string> toMove = parseJSONPath(JSONPath2);
+	fileObject.createPath(toMove);
 }
 
-void JSONFile::order()
+void JSONFile::order(const std::string JSONPath)
 {
+	std::string key;
+	std::cout << "Please input key:\n";
+	std::cin >> key;
+
+	std::queue<std::string> nodes = parseJSONPath(JSONPath);
+	JSONElement *toOrder = fileObject.traverse(nodes);
+
+	toOrder->order(key);
+
 }
 
 void JSONFile::selectedAsWorking()

@@ -38,8 +38,15 @@ public:
     void updateAncestors(const size_t &);
     void updateChildren();
 
+    void createPath(std::queue<std::string> &);
+
     void addChild(JSONElement);
     void removeChild(JSONElement *);
+
+    const std::string &getDataByKey(const std::string);
+    bool hasChildWithKey(const std::string);
+    bool checkChildren(const std::string);
+    void order(const std::string);
 
     JSONElement &takeByKey(const std::string,JSONElement &);
     JSONElement findByKey(const std::string);

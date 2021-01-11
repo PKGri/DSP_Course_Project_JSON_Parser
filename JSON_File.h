@@ -8,8 +8,7 @@
 трябва да добави такъв елемент и да му присвои прочетената според синтаксиса
 на JSON стойност на низа. Ако такъв елемент съществува, трябва да се обяви
 това като проблем. В противен случай да се добави елемента, евентуално с
-рекурсивно създаване на целия път. Ако символният низ не е коректен, да
-се съобщи с подходящо описание на грешката.
+рекурсивно създаване на целия път.
 
 Преместване. 
 При подаване на два пътя, всички елементи, намиращи се на на първия път,
@@ -41,8 +40,6 @@ public:
     JSONFile();
     ~JSONFile();
 
-    void createElement(const std::string);
-
     void open();
 
     void print();
@@ -59,10 +56,10 @@ public:
 
     void findByKey(const std::string);
     void set(const std::string);
-    void create();
+    void create(const std::string);
     void remove(const std::string);
-    void move();
-    void order();
+    void move(const std::string, const std::string);
+    void order(const std::string);
     void selectedAsWorking();
     void reset();
 

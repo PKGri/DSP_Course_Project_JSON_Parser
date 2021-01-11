@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 
+char consent(const std::string);
+
 bool isJSONFile(const std::string &);
 
 JSONElement parseValue(std::istream &, const std::string);

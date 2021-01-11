@@ -1,9 +1,9 @@
 #include <exception>
-#include <regex>
 #include <sstream>
 #include <functional>
 
 #include "JSON_Element.h"
+#include "Parsing.h"
 
 JSONElement::JSONElement() {}
 
@@ -111,6 +111,31 @@ void JSONElement::updateChildren()
     }
 }
 
+void JSONElement::createPath(std::queue<std::string> &nodes)
+{
+    std::queue<std::string> toCreate = nodes;
+
+    try
+    {
+        traverse(nodes);
+    }
+    catch (const std::exception &e)
+    {
+        char c = consent("Path does not exist! Create?");
+        switch (c)
+        {
+        case 'Y':
+            break;
+        case 'y':
+            break;
+        case 'N':
+            return;
+        case 'n':
+            return;
+        }
+    }
+}
+
 void JSONElement::addChild(JSONElement child)
 {
     child.updateAncestors(ancestors + 1);
@@ -118,10 +143,10 @@ void JSONElement::addChild(JSONElement child)
 }
 
 void JSONElement::removeChild(JSONElement *toRemove)
-{   
+{
     std::list<JSONElement>::iterator child = children.begin();
     while (child != children.end())
-    {   
+    {
         std::cout << toRemove << " TO REMOVE " << *toRemove << '\n';
         std::cout << &*child << " CHILD " << child->data << '\n';
 
@@ -134,11 +159,71 @@ void JSONElement::removeChild(JSONElement *toRemove)
     }
 }
 
+const std::string &JSONElement::getDataByKey(const std::string _key)
+{
+    for (JSONElement &child : children)
+    {
+        if (child.key == _key)
+        {
+            return child.data;
+        }
+    }
+
+    throw std::runtime_error("Element has no such child!");
+}
+
+bool JSONElement::hasChildWithKey(const std::string _key)
+{
+    for (JSONElement &child : children)
+    {
+        if (child.key == _key && (child.type == 'n' || child.type == 's'))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool JSONElement::checkChildren(const std::string _key)
+{
+    for (JSONElement &child : children)
+    {
+        if (child.type != 'o' || !child.hasChildWithKey(_key))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool compare(JSONElement &first, JSONElement&second, std::string _key)
+{
+    return first.getDataByKey(_key).compare(second.getDataByKey(_key)) == -1;
+}
+
+void JSONElement::order(const std::string _key)
+{
+    if (type != 'a')
+    {
+        throw std::runtime_error("Element is not array!");
+    }
+
+    if (checkChildren(_key))
+    {
+        auto compareCurry = std::bind(compare, std::placeholders::_1, std::placeholders::_2, _key);
+        children.sort(compareCurry);
+    }
+    else
+    {
+        throw std::runtime_error("Cannot order elements!");
+    }
+}
+
 JSONElement &JSONElement::takeByKey(const std::string _key, JSONElement &result)
 {
-    for(JSONElement child : children)
+    for (JSONElement child : children)
     {
-        if(child.key == _key)
+        if (child.key == _key)
         {
             result.addChild(JSONElement(child));
             result.children.back().setKey("");
@@ -262,16 +347,16 @@ JSONElement *JSONElement::traverse(std::queue<std::string> &nodes)
     }
 }
 
-void JSONElement::operator =(const JSONElement &other)
+void JSONElement::operator=(const JSONElement &other)
 {
     copy(&other);
 }
 
-bool JSONElement::operator ==(const JSONElement &other) const
+bool JSONElement::operator==(const JSONElement &other) const
 {
-    return type == other.type && key == other.key && 
-    data == other.data && children == other.children &&
-    ancestors == other.ancestors; 
+    return type == other.type && key == other.key &&
+           data == other.data && children == other.children &&
+           ancestors == other.ancestors;
 }
 
 void JSONElement::printKey(std::ostream &os) const
