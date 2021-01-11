@@ -254,16 +254,14 @@ void JSONFile::set(const std::string JSONPath)
 	if (c == '{')
 	{
 		JSONElement &toSet = *fileObject.traverse(nodes);
-		std::cout << toSet;
 		toSet.setType('o');
 		toSet.getChildren() = parseObject(std::cin);
 	}
 	else
 	{
 		JSONElement &toSet = *fileObject.traverse(nodes);
-		std::cout << toSet;
-		toSet.setType('o');
-		toSet.getChildren() = parseObject(std::cin);
+		toSet.setType('a');
+		toSet.getChildren() = parseArray(std::cin);
 	}
 
 	updateAncestors();
