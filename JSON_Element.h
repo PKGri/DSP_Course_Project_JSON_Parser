@@ -41,7 +41,8 @@ public:
     void addChild(JSONElement);
     void removeChild(JSONElement *);
 
-    JSONElement findByKey(const std::string &);
+    JSONElement &takeByKey(const std::string,JSONElement &);
+    JSONElement findByKey(const std::string);
 
     const char getType() const;
     const std::string &getKey() const;

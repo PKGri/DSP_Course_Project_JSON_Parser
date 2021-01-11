@@ -5,7 +5,7 @@
 #include <sstream>
 #include <stack>
 
-JSONFile::JSONFile() : path(), fileObject() /*, workingObject(nullptr)*/ {}
+JSONFile::JSONFile() : path(), fileObject() , workingObject(nullptr) {}
 
 JSONFile::~JSONFile() {}
 
@@ -32,7 +32,7 @@ void JSONFile::open()
 			json_file.close();
 			std::ofstream new_file(path.data());
 			new_file.close();
-			std::cout << "Successfully created " << path << '\n';
+			std::cout << "Successfully created " << path << "\nPlease close!\n";
 			return;
 		}
 
@@ -67,7 +67,7 @@ void JSONFile::open()
 
 		json_file.close();
 
-		saveObject = fileObject;
+		workingObject = &fileObject;
 	}
 	else
 	{
@@ -78,6 +78,11 @@ void JSONFile::open()
 void JSONFile::print()
 {
 	std::cout << fileObject << '\n';
+}
+
+void JSONFile::printSelected()
+{
+	std::cout << selectedObject << '\n';
 }
 
 char consent(const std::string question)
@@ -167,7 +172,7 @@ void uncompressedPrint(std::ofstream &outputFile, JSONElement *toPrint)
 void JSONFile::saveElement(const std::string JSONPath)
 {
 	std::queue<std::string> nodes = parseJSONPath(JSONPath);
-	JSONElement *toPrint = fileObject.traverse(nodes);
+	JSONElement *toPrint = workingObject->traverse(nodes);
 	toPrint->updateAncestors(0);
 
 	std::ofstream outputFile(path.data());
@@ -228,15 +233,81 @@ void JSONFile::saveElementAs(const std::string JSONPath)
 	saveElement(JSONPath);
 }
 
+void JSONFile::saveSelected()
+{
+	std::ofstream outputFile(path.data());
+
+	char c = consent("Do you wish to save object compressed?");
+
+	switch (c)
+	{
+	case 'Y':
+		selectedObject.compressedPrint(outputFile);
+		break;
+	case 'y':
+		selectedObject.compressedPrint(outputFile);
+		break;
+	case 'N':
+		outputFile << selectedObject;
+		break;
+	case 'n':
+		outputFile << selectedObject;
+		break;
+	}
+
+	outputFile.close();
+}
+
+void JSONFile::saveSelectedAs()
+{
+	std::cout << "Please input save path: ";
+
+	std::string _path;
+	std::cin >> _path;
+
+	std::ifstream check;
+	check.open(_path);
+
+	if (!check.fail())
+	{
+		check.close();
+		char c = consent("File already exists. Overwrite?");
+
+		switch (c)
+		{
+		case 'Y':
+			path = _path;
+			break;
+		case 'y':
+			path = _path;
+			break;
+		case 'N':
+			return;
+		case 'n':
+			return;
+		}
+	}
+
+	saveSelected();
+}
+
 void JSONFile::JSONPath(const std::string JSONPath)
 {
 	std::queue<std::string> nodes = parseJSONPath(JSONPath);
-	std::cout << *fileObject.traverse(nodes) << '\n';
+	std::cout << *workingObject->traverse(nodes) << '\n';
 }
 
-void JSONFile::findByKey(const std::string &key)
+void JSONFile::findByKey(const std::string key)
 {
-	fileObject = fileObject.findByKey(key);
+	if (key == "$")
+	{
+		selectedObject = fileObject;
+	}
+	else
+	{
+		selectedObject = workingObject->findByKey(key);
+	}
+	
 }
 
 void JSONFile::set(const std::string JSONPath)
@@ -288,9 +359,16 @@ void JSONFile::order()
 {
 }
 
+void JSONFile::selectedAsWorking()
+{
+	workingObject = &selectedObject;
+	std::cout << "Working on selected object!\n";
+}
+
 void JSONFile::reset()
 {
-	fileObject = saveObject;
+	workingObject = &fileObject;
+	std::cout << "Working on original object!\n";
 }
 
 std::string JSONFile::getPath()
@@ -301,6 +379,7 @@ std::string JSONFile::getPath()
 void JSONFile::clear()
 {
 	path = "";
-	saveObject.clear();
+	workingObject = nullptr;
+	selectedObject.clear();
 	fileObject.clear();
 }

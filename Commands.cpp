@@ -62,6 +62,19 @@ void saveElementAs() // Saves file to specified path
 	std::cout << "Succesfully saved as " << file.getPath() << '\n';
 }
 
+void saveSelected() // Saves file to original path
+{
+	file.saveSelected();
+	std::cout << "Succesfully saved selected in" << file.getPath() << '\n';
+}
+
+void saveSelectedAs() // Saves file to specified path
+{
+	file.saveSelectedAs();
+	std::cout << "Succesfully saved selected as " << file.getPath() << '\n';
+}
+
+
 void help() // Prints supported functionalities
 {
 	std::cout << "\nThe following commands are supported:\n\n"
@@ -73,26 +86,29 @@ void help() // Prints supported functionalities
 				 " -saves information to origin file\n"
 				 "saveas <file>\n"
 				 " -saves information to <file>\n"
-				 "saveelement <JSONPath Expression>\n"
-				 " -saves selected information to origin file\n"
-				 "saveelementas <JSONPath Expression>\n<file>\n"
-				 " -saves selected information to <file>\n"
-				 "print\n"
-				 " -prints out current content\n"
+				 "saveelement <JSONPath>\n"
+				 " -saves result of <JSONPath> evaluation to origin file\n"
+				 "saveelementas <JSONPath>\n<file>\n"
+				 " -saves result of <JSONPath> evaluation to <file>\n"
 				 "select <key>\n"
 				 " -creates an array of all elements with <key> as their key\n"
-				 "set <JSONPath Expression>\n<JSON Object>\n"
-				 " -sets the result of the evaluated <JSONPath Expression> to the evaluation of <JSON Object>"
-				 "(work in progress)create <JSONPath Expression>\n<JSON Object>\n"
+				 " -and sets that as selected object\n"
+				 "set <JSONPath>\n<JSON Object>\n"
+				 " -sets the result of the evaluated <JSONPath> to the evaluation of <JSON Object>"
+				 "(work in progress)create <JSONPath>\n<JSON Object>\n"
 				 " -creates object at given location"
-				 "remove <JSONPath Expression>\n"
-				 " -removes the result of the evaluated <JSONPath Expression>"
-				 "(work in progress)move <JSONPath Expression 1>\n<JSONPath Expression 2>\n"
-				 " -moves object found at <JSONPath Expression 1> to <JSONPath Expression 2>"
-				 "(work in progress)order <JSONPath Expression>"
-				 " -orders result of <JSONPath Expression> evaluation if result is array"
+				 "remove <JSONPath>\n"
+				 " -removes the result of the evaluated <JSONPath>"
+				 "(work in progress)move <JSONPath 1>\n<JSONPath 2>\n"
+				 " -moves object found at <JSONPath 1> to <JSONPath 2>"
+				 "(work in progress)order <JSONPath>"
+				 " -orders result of <JSONPath> evaluation if result is array"
 				 "JSONPath <JSONPath>\n"
-				 " -prints the result from evaluating simple JSONPath expressions\n"
+				 " -prints the result from evaluating simple <JSONPath> expressions\n"
+				 "print\n"
+				 " -prints out current content\n"
+				 "printselected\n"
+				 " -prints out selected content\n"
 				 "help\n"
 				 " -prints this information\n"
 				 "exit\n"
@@ -102,6 +118,11 @@ void help() // Prints supported functionalities
 void print() // Prints loaded file data
 {
 	file.print();
+}
+
+void printSelected() // Prints loaded file data
+{
+	file.printSelected();
 }
 
 void select()
@@ -138,6 +159,11 @@ void order()
 {
 }
 
+void selectedAsWorking()
+{
+	file.selectedAsWorking();
+}
+
 void reset()
 {
 	file.reset();
@@ -161,9 +187,11 @@ bool mainCommandList(std::string command)
 bool openCommandList(std::string command)
 {
 	return command == "close" || command == "save" || command == "saveas" || command == "saveelement" 
-	|| command == "saveelementas" || command == "help" || command == "exit" || command == "print" 
+	|| command == "saveelementas" || command == "saveselected" || command == "saveselectedas" 
+	|| command == "help" || command == "exit" || command == "print" || command == "printselected" 
 	|| command == "select" || command == "set" || command == "create" || command == "remove" 
-	|| command == "swap" || command == "order" || command == "JSONPath";
+	|| command == "swap" || command == "order" || command == "JSONPath" || command == "selectedasworking" 
+	|| command == "reset";
 }
 
 void executeCommand(std::string command)
@@ -180,8 +208,14 @@ void executeCommand(std::string command)
 		saveElement();
 	else if (command == "saveelementas")
 		saveElementAs();
+	else if (command == "saveselected")
+		saveSelected();
+	else if (command == "saveselectedas")
+		saveSelectedAs();
 	else if (command == "print")
 		print();
+	else if (command == "printselected")
+		printSelected();
 	else if (command == "select")
 		select();
 	else if (command == "set")
@@ -194,6 +228,8 @@ void executeCommand(std::string command)
 		move();
 	else if (command == "order")
 		order();
+	else if (command == "selectedasworking")
+		selectedAsWorking();
 	else if (command == "reset")
 		reset();
 

@@ -29,7 +29,8 @@ private:
     std::string path;
 
     JSONElement fileObject;
-    JSONElement saveObject;
+    JSONElement selectedObject;
+    JSONElement *workingObject;
     
 	JSONElement& listNth(const size_t n);
     
@@ -45,20 +46,24 @@ public:
     void open();
 
     void print();
+    void printSelected();
 
     void save();
     void saveAs();
     void saveElement(const std::string);
     void saveElementAs(const std::string);
+    void saveSelected();
+    void saveSelectedAs();
 
     void JSONPath(const std::string);
 
-    void findByKey(const std::string &);
+    void findByKey(const std::string);
     void set(const std::string);
     void create();
     void remove(const std::string);
     void move();
     void order();
+    void selectedAsWorking();
     void reset();
 
     std::string getPath();

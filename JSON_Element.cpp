@@ -122,6 +122,9 @@ void JSONElement::removeChild(JSONElement *toRemove)
     std::list<JSONElement>::iterator child = children.begin();
     while (child != children.end())
     {   
+        std::cout << toRemove << " TO REMOVE " << *toRemove << '\n';
+        std::cout << &*child << " CHILD " << child->data << '\n';
+
         if (&*child == toRemove)
         {
             children.erase(child);
@@ -131,26 +134,28 @@ void JSONElement::removeChild(JSONElement *toRemove)
     }
 }
 
-JSONElement &takeByKey(const std::string& key, JSONElement &range,JSONElement &result)
+JSONElement &JSONElement::takeByKey(const std::string _key, JSONElement &result)
 {
-    for(JSONElement child : range.getChildren())
+    for(JSONElement child : children)
     {
-        if(child.getKey() == key)
+        if(child.key == _key)
         {
             result.addChild(JSONElement(child));
-            result.getChildren().back().setKey("");
+            result.children.back().setKey("");
         }
-        takeByKey(key, child, result);
+        child.takeByKey(_key, result);
     }
 
     return result;
 }
 
-JSONElement JSONElement::findByKey(const std::string &key)
+JSONElement JSONElement::findByKey(const std::string _key)
 {
     JSONElement result('a');
 
-    takeByKey(key, *this, result);
+    takeByKey(_key, result);
+
+    result.updateAncestors(0);
 
     return result;
 }
