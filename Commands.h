@@ -10,16 +10,20 @@ void save();
 void saveAs();
 void saveElement();
 void saveElementAs();
+void saveSelected();
+void saveSelectedAs();
 void help();
 
 void print();
+void printSelected();
 void select();
 void set();
 void create();
 void remove();
 void move();
 void order();
-//void reset();
+void selectedAsWorking();
+void reset();
 
 void JSONPath();
 

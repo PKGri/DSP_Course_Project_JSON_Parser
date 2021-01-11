@@ -7,12 +7,8 @@
 
 int main()
 {
-	
-
 	enterCommand(&isExit, &mainCommandList);
 	
-	
-
 	std::cout << "Exiting";
 
 	return 0;
